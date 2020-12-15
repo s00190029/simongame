@@ -3,16 +3,25 @@ package edu.rdonoghue.simongame;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    Button bred, bblue, byel, green;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        bred = findViewById(R.id.btn_red);
+        bblue = findViewById(R.id.btn_blue);
+        byel = findViewById(R.id.btn_yel);
+        green = findViewById(R.id.btn_green);
 
         DatabaseHandler db = new DatabaseHandler(this);
 
@@ -96,5 +105,39 @@ public class MainActivity extends AppCompatActivity {
             Log.i("Score: ", log);
         }
 
+    }
+
+    public void doPlay(View view) {
+        flashButton(bred);
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                flashButton(bblue);
+            }
+        },  1000 );
+    }
+
+
+    private void flashButton (Button btnIn){
+        Handler handler = new Handler();
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                btnIn.setPressed(true);
+                btnIn.invalidate();
+                btnIn.performClick();
+                Handler handler1 = new Handler();
+                Runnable r1 = new Runnable() {
+                    @Override
+                    public void run() {
+                        btnIn.setPressed(false);
+                        btnIn.invalidate();
+                    }
+                };
+                handler1.postDelayed(r1, 400);
+            }
+        };
+        handler.postDelayed(r, 400);
     }
 }
