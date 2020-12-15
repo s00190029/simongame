@@ -67,5 +67,34 @@ public class MainActivity extends AppCompatActivity {
             // Writing HiScore to log
             Log.i("Score: ", log);
         }
+        Log.i("divider", "====================");
+
+        HiScore hiScore = top5HiScores.get(top5HiScores.size() - 1);
+        // hiScore contains the 5th highest score
+        Log.i("fifth Highest score: ", String.valueOf(hiScore.getScore()) );
+
+        // simple test to add a hi score
+        int myCurrentScore = 40;
+        // if 5th highest score < myCurrentScore, then insert new score
+        if (hiScore.getScore() < myCurrentScore) {
+            db.addHiScore(new HiScore("08 DEC 2020", "Elrond", 40));
+        }
+
+        Log.i("divider", "====================");
+
+        // Calling SQL statement
+        top5HiScores = db.getTopFiveScores();
+
+        for (HiScore hs : top5HiScores) {
+            String log =
+                    "Id: " + hs.getScore_id() +
+                            ", Date: " + hs.getGame_date() +
+                            " , Player: " + hs.getPlayer_name() +
+                            " , Score: " + hs.getScore();
+
+            // Writing HiScore to log
+            Log.i("Score: ", log);
+        }
+
     }
 }
