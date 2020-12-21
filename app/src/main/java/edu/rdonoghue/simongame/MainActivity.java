@@ -2,6 +2,10 @@ package edu.rdonoghue.simongame;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,8 +15,13 @@ import android.widget.Button;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
     Button bred, bblue, byel, green;
+
+
+    // SENSORS
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +31,10 @@ public class MainActivity extends AppCompatActivity {
         bblue = findViewById(R.id.btn_blue);
         byel = findViewById(R.id.btn_yel);
         green = findViewById(R.id.btn_green);
+
+        // SET SENSORS TO ACCELEROMETER
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         DatabaseHandler db = new DatabaseHandler(this);
 
@@ -118,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
         },  1000 );
     }
 
-
     private void flashButton (Button btnIn){
         Handler handler = new Handler();
         Runnable r = new Runnable() {
@@ -139,5 +151,15 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         handler.postDelayed(r, 400);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 }
