@@ -13,10 +13,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 public class play_area extends AppCompatActivity implements SensorEventListener {
-    //VARIABLES
+
+    // VAR DELCARE
     private final double NORTH_MOVE_FORWARD = 9.0;   // upper mag limit
     private final double NORTH_MOVE_BACKWARD = 7.0;   // lower mag limit
     boolean highLimit = false;  // detect high limit
@@ -24,18 +23,21 @@ public class play_area extends AppCompatActivity implements SensorEventListener 
     private Sensor mSensor;
     int counter = 0;   // step counter
     public float [] northValue;
-    Button bRed, bBlue, bYellow, bGreen, fb;
-    boolean north,south,east,west,neutral;
-    public TextView dir;
+    Button bred, bblue, byel, bgreen, fb;
+
+    public TextView directory;
     private final int BLUE = 1;
     private final int RED = 2;
     private final int YELLOW = 3;
     private final int GREEN = 4;
-    int[] gameSequence = new int[24];
+
     int arrayIndex = 0;
-    int sequenceCounter = 0;
+    int sequenceCount = 0;
     public static int sequenceMax =4;
-    int[] arrayB = new int[24];
+
+    boolean north,south,east,west,neutral;
+    int[] arrayInternal = new int[12];
+    int[] playSeq = new int[12];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,39 +45,24 @@ public class play_area extends AppCompatActivity implements SensorEventListener 
         setContentView(R.layout.activity_play_area);
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        bRed = findViewById(R.id.btn_red);
-        bBlue = findViewById(R.id.btn_blue);
-        bYellow = findViewById(R.id.btn_yel);
-        bGreen = findViewById(R.id.btn_green);
+        bred = findViewById(R.id.btn_red);
+        bblue = findViewById(R.id.btn_blue);
+        byel = findViewById(R.id.btn_yel);
+        bgreen = findViewById(R.id.btn_green);
         //dir = findViewById(R.id.tv_dirState);
         Bundle b = getIntent().getExtras();
-        arrayB = b.getIntArray("numbers");
-
-
-
-    }
-    public boolean compare(int[]array1in,int[]array2in){
-        boolean isSame = true;
-        for (int i = 0;i<array1in.length; i++){
-            if(array1in[i]!=array2in[i]){
-                isSame=false;
-            }
-            else { }
-        }
-        return isSame;
+        arrayInternal = b.getIntArray("numbers");
     }
 
     protected void onResume() {
         super.onResume();
         // turn on the sensor
         mSensorManager.registerListener(this, mSensor,
-
                 SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     protected void onPause() {
         super.onPause();
-        // turn off listener to save power
         mSensorManager.unregisterListener(this);
     }
     private void flashButton(Button button) {
@@ -95,8 +82,7 @@ public class play_area extends AppCompatActivity implements SensorEventListener 
                     }
                 };
                 handler1.postDelayed(r1, 600);
-
-            } // end runnable
+            }
         };
         handler.postDelayed(r, 600);
     }
@@ -106,50 +92,24 @@ public class play_area extends AppCompatActivity implements SensorEventListener 
         float x = event.values[0];
         float y = event.values[1];
         float z = event.values[2];
-        bBlue.setText(String.valueOf(z));
-        bRed.setText(String.valueOf(x));
-        bYellow.setText(String.valueOf(y));
-        float[] northC = {-1f,0.1f,0};
-        float[] southC = {9.6f,0.14f,0};
-        float[] eastC = {7.1f,2.6f,0};
-        float[] westC = {7f,1f,0};
-        float[] neutralC = {8.5f,0.12f,0};
+        bblue.setText(String.valueOf(z));
+        bred.setText(String.valueOf(x));
+        byel.setText(String.valueOf(y));
 
-        // Can we get a north movement
-       /* if ((x > NORTH_MOVE_FORWARD) && (highLimit == false)) {
-
-                highLimit = true;
-                bGreen.setPressed(false);
-        }
-        if ((x < NORTH_MOVE_BACKWARD) && (highLimit == true)) {
-            // we have a tilt to the north
-            if(z > 3.4) {
-                counter++;
-                highLimit = false;
-                bGreen.setPressed(true);
-                Toast.makeText(this, "north activated", Toast.LENGTH_SHORT).show();
-            }
-        }*/
+        // COORDINATE VALUES
+        float[] northC = {1,2,3,4};
+        float[] southC = {1,2,3,4};
+        float[] eastC = {1,2,3,4};
+        float[] westC = {1,2,3,4};
+        float[] neutralC = {1,2,3,4};
 
 
-        //north
-        if(((x <=northC[0])&& (y<=northC[1]))&& isNeutral()==true){
-            greenPress();
-            dir.setText("north");
-            neutral= false;
-            bGreen.setPressed(true);
-        }
-        else{
-            bGreen.setPressed(false);
-            highLimit=true;
-
-        }
         //neutral
         if(((x >= neutralC[0])&& (y>=neutralC[1]))){
             directionReset();
 
             //  Toast.makeText(this, "neutral", Toast.LENGTH_SHORT).show();
-            dir.setText("neutral");
+            directory.setText("neutral");
         }
         else{
 
@@ -157,40 +117,50 @@ public class play_area extends AppCompatActivity implements SensorEventListener 
 
         }
 
-
-        //south
-        if(((x < southC[0] )&& (y> southC[1]))&&isNeutral() == true){
-            bluePress();
-            dir.setText("south");
-            neutral = false;
-            bBlue.setPressed(true);
+        //  NORTH
+        if(((x <=northC[0])&& (y<=northC[1]))&& isNeutral()==true){
+            greenPress();
+            directory.setText("north");
+            neutral= false;
+            bgreen.setPressed(true);
         }
         else{
-            bBlue.setPressed(false);
+            bgreen.setPressed(false);
+            highLimit=true;
+        }
+
+        // SOUTH
+        if(((x < southC[0] )&& (y> southC[1]))&&isNeutral() == true){
+            bluePress();
+            directory.setText("south");
+            neutral = false;
+            bblue.setPressed(true);
+        }
+        else{
+            bblue.setPressed(false);
             highLimit=true;
         }
         //east
         if((x>eastC[0])&&(y>eastC[1])&& isNeutral() == true){
             yellowPress();
-            dir.setText("east");
+            directory.setText("east");
             neutral = false;
-            bYellow.setPressed(true);
+            byel.setPressed(true);
         }
         else{
-            bYellow.setPressed(false);
+            byel.setPressed(false);
             highLimit=true;
         }
 
-        //west
-
+        // WEST
         if((x<westC[0])&&(y<westC[1])&& isNeutral() == true){
             redPress();
-            dir.setText("west");
+            directory.setText("west");
             neutral = false;
-            bRed.setPressed(true);
+            bred.setPressed(true);
         }
         else{
-            bRed.setPressed(false);
+            bred.setPressed(false);
             highLimit=true;
         }
 
@@ -214,9 +184,7 @@ public class play_area extends AppCompatActivity implements SensorEventListener 
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // not used
-    }
+    public void onAccuracyChanged(Sensor sensor, int accuracy) { }
 
     public static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
@@ -227,61 +195,57 @@ public class play_area extends AppCompatActivity implements SensorEventListener 
         return (double) tmp / factor;
     }
 
-    //work with button press
+    // BUTTON PRESS
     public void doBlue(View view) {
         bluePress();
     }
     public void bluePress(){
-        gameSequence[arrayIndex++] = BLUE;
-        // Toast.makeText(this, "blue", Toast.LENGTH_SHORT).show();
-        //  sequenceCounter++;
-        sequenceCheck();
+        playSeq[arrayIndex++] = BLUE;
+        seqVerify();
     }
 
     public void doYellow(View view) {
         yellowPress();
     }
     public void yellowPress(){
-        gameSequence[arrayIndex++] = YELLOW;
-        //   Toast.makeText(this, "yellow", Toast.LENGTH_SHORT).show();
-        //  sequenceCounter++;
-        sequenceCheck();
+        playSeq[arrayIndex++] = YELLOW;
+        seqVerify();
     }
 
     public void doGreen(View view) {
         greenPress();
     }
     public void greenPress(){
-        gameSequence[arrayIndex++] = GREEN;
-        //     Toast.makeText(this, "green", Toast.LENGTH_SHORT).show();
-        //  sequenceCounter++;
-        sequenceCheck();
+        playSeq[arrayIndex++] = GREEN;
+        seqVerify();
     }
     public void doRed(View view){
         redPress();
     }
     public void redPress(){
-        gameSequence[arrayIndex++] = RED;
-        //   Toast.makeText(this, "red", Toast.LENGTH_SHORT).show();
-        //  sequenceCounter++;
-        sequenceCheck();
+        playSeq[arrayIndex++] = RED;
+        seqVerify();
     }
 
-    public void sequenceCheck(){
-        sequenceCounter++;
-        if(sequenceCounter == sequenceMax){
-            if(compare(gameSequence,arrayB) == true){
+    public void seqVerify(){
+        sequenceCount++;
+        if(sequenceCount == sequenceMax){
+            if(compareArrays(playSeq, arrayInternal) == true){
                 Toast.makeText(this, "correct", Toast.LENGTH_SHORT).show();
-
             }
-            else{
-                Toast.makeText(this, "you suck", Toast.LENGTH_SHORT).show();
-            }
-
+            else { Toast.makeText(this, "you suck", Toast.LENGTH_SHORT).show(); }
         }
-
     }
 
-
+    public boolean compareArrays(int[]array1in, int[]array2in){
+        boolean same = true;
+        for (int i = 0;i<array1in.length; i++){
+            if(array1in[i]!=array2in[i]){
+                same=false;
+            }
+            else { }
+        }
+        return same;
+    }
 
 }
